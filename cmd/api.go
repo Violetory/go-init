@@ -2,6 +2,7 @@ package main
 
 import (
 	repo "github.com/Violetory/e-com/internal/adapters/postgresql/sqlc"
+	"github.com/Violetory/e-com/internal/orders"
 	"github.com/jackc/pgx/v5"
 	"log"
 	"net/http"
@@ -14,6 +15,7 @@ import (
 
 // Mount
 func (app *application) mount() http.Handler {
+	queries := repo.New(app.db) // 定义数据库查询对象
 	r := chi.NewRouter()
 
 	// Middleware
@@ -25,10 +27,6 @@ func (app *application) mount() http.Handler {
 	// Timeout middleware
 	r.Use(middleware.Timeout(60 * time.Second))
 
-	// 初始化商品服务和处理器
-	productService := products.NewService(repo.New(app.db))
-	productHandler := products.NewHandler(productService)
-
 	// 健康检查
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		if _, err := w.Write([]byte("非常好👍")); err != nil {
@@ -36,11 +34,20 @@ func (app *application) mount() http.Handler {
 		}
 	})
 
+	// 初始化商品服务和处理器
+	productService := products.NewService(queries)
+	productHandler := products.NewHandler(productService)
+
 	// 获取商品列表
 	r.Get("/product/list", productHandler.ListProducts)
 
 	// 获取商品详情
 	r.Get("/product/get", productHandler.GetProduct)
+
+	// 初始化订单服务和处理器
+	orderService := orders.NewService(queries, app.db)
+	orderHandler := orders.NewHandler(orderService)
+	r.Post("/orders/create", orderHandler.PlaceOrder)
 
 	return r
 }

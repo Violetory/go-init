@@ -9,6 +9,9 @@ import (
 )
 
 type Querier interface {
+	CreateOrder(ctx context.Context, customerID int64) (Order, error)
+	CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (OrderItem, error)
+	DecreaseProductStock(ctx context.Context, arg DecreaseProductStockParams) (int64, error)
 	GetProductByID(ctx context.Context, id int64) (Product, error)
 	ListProducts(ctx context.Context) ([]Product, error)
 }

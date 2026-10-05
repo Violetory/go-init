@@ -1,0 +1,1 @@
+-- 在这里添加 SQL 查询，随后执行 sqlc generate。

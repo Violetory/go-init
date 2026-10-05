@@ -1,21 +1,17 @@
 package main
 
 import (
-	repo "github.com/Violetory/e-com/internal/adapters/postgresql/sqlc"
-	"github.com/Violetory/e-com/internal/orders"
-	"github.com/jackc/pgx/v5"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/Violetory/e-com/internal/products"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5"
 )
 
 // Mount
 func (app *application) mount() http.Handler {
-	queries := repo.New(app.db) // 定义数据库查询对象
 	r := chi.NewRouter()
 
 	// Middleware
@@ -33,21 +29,6 @@ func (app *application) mount() http.Handler {
 			log.Printf("write root response: %v", err)
 		}
 	})
-
-	// 初始化商品服务和处理器
-	productService := products.NewService(queries)
-	productHandler := products.NewHandler(productService)
-
-	// 获取商品列表
-	r.Get("/product/list", productHandler.ListProducts)
-
-	// 获取商品详情
-	r.Get("/product/get", productHandler.GetProduct)
-
-	// 初始化订单服务和处理器
-	orderService := orders.NewService(queries, app.db)
-	orderHandler := orders.NewHandler(orderService)
-	r.Post("/orders/create", orderHandler.PlaceOrder)
 
 	return r
 }

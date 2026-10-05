@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/Violetory/e-com/internal/env"
+	"example.com/go-init-template/internal/env"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 )
